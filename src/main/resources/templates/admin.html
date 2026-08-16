@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Administration - Software Development Document Environment</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+</head>
+<body class="bg-light">
+    <div class="container-fluid px-4 py-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h4 class="fw-bold"><i class="bi bi-gear-fill me-2"></i>Admin Console & Configuration Maintenance</h4>
+            <a href="/" class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-left"></i> Workbench</a>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-6">
+                <div class="card shadow-sm h-100">
+                    <div class="card-header bg-dark text-white fw-bold"><i class="bi bi-sliders me-2"></i>System Parameters</div>
+                    <div class="card-body">
+                        <table class="table table-sm align-middle">
+                            <thead>
+                                <tr><th>Key</th><th>Value</th><th>Action</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="cfg : ${configs}">
+                                    <form action="/admin/config/update" method="post">
+                                        <td class="small fw-bold" th:text="${cfg.configKey}">app.name</td>
+                                        <td>
+                                            <input type="hidden" name="configKey" th:value="${cfg.configKey}">
+                                            <input type="text" name="configValue" th:value="${cfg.configValue}" class="form-control form-control-sm">
+                                        </td>
+                                        <td>
+                                            <button type="submit" class="btn btn-sm btn-primary py-0">Save</button>
+                                        </td>
+                                    </form>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card shadow-sm h-100">
+                    <div class="card-header bg-primary text-white fw-bold"><i class="bi bi-file-earmark-arrow-up me-2"></i>Document Template Upload (Admin Only)</div>
+                    <div class="card-body">
+                        <form action="/admin/templates/upload" method="post" enctype="multipart/form-data">
+                            <div class="mb-2">
+                                <label class="form-label small fw-bold">Phase Number</label>
+                                <select name="phaseNum" class="form-select form-select-sm">
+                                    <option value="1">Phase 1 (PC-01, FS-01)</option>
+                                    <option value="2">Phase 2 (SRS-01, UC-01)</option>
+                                    <option value="3">Phase 3 (HLD-01, DB-01)</option>
+                                    <option value="4">Phase 4 (API-01, UTP-01)</option>
+                                    <option value="5">Phase 5 (SIT-01, UAT-01)</option>
+                                    <option value="6">Phase 6 (DIG-01, OMM-01)</option>
+                                    <option value="7">Phase 7 (PIR-01)</option>
+                                </select>
+                            </div>
+                            <div class="mb-2">
+                                <label class="form-label small fw-bold">Deliverable Code</label>
+                                <input type="text" name="deliverableCode" class="form-control form-control-sm" placeholder="e.g. SRS-01" required>
+                            </div>
+                            <div class="mb-2">
+                                <label class="form-label small fw-bold">Template Name</label>
+                                <input type="text" name="templateName" class="form-control form-control-sm" placeholder="e.g. Standard SRS Template" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold">Template File</label>
+                                <input type="file" name="file" class="form-control form-control-sm" required>
+                            </div>
+                            <button type="submit" class="btn btn-sm btn-success w-100"><i class="bi bi-cloud-upload"></i> Upload Official Template</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-secondary text-white fw-bold"><i class="bi bi-people me-2"></i>User Maintenance & Password Controls</div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4 border-end">
+                                <h6 class="fw-bold mb-3">Create New User</h6>
+                                <form action="/admin/users/create" method="post">
+                                    <div class="mb-2"><input type="text" name="username" class="form-control form-control-sm" placeholder="Username" required></div>
+                                    <div class="mb-2"><input type="password" name="password" class="form-control form-control-sm" placeholder="Password" required></div>
+                                    <div class="mb-2"><input type="email" name="email" class="form-control form-control-sm" placeholder="Email" required></div>
+                                    <div class="mb-2"><input type="text" name="mobileNumber" class="form-control form-control-sm" placeholder="Mobile Number"></div>
+                                    <div class="mb-2">
+                                        <select name="role" class="form-select form-select-sm">
+                                            <option value="MAKER">MAKER</option>
+                                            <option value="CHECKER">CHECKER</option>
+                                            <option value="ADMIN">ADMIN</option>
+                                        </select>
+                                    </div>
+                                    <button type="submit" class="btn btn-sm btn-dark w-100">Create Account</button>
+                                </form>
+                            </div>
+                            <div class="col-md-8">
+                                <h6 class="fw-bold mb-3">Existing System Accounts</h6>
+                                <table class="table table-sm table-striped align-middle">
+                                    <thead>
+                                        <tr><th>Username</th><th>Role</th><th>Email</th><th>Status</th><th>Actions</th></tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr th:each="user : ${users}">
+                                            <td class="fw-bold" th:text="${user.username}">username</td>
+                                            <td th:text="${user.role}">ROLE</td>
+                                            <td th:text="${user.email}">email</td>
+                                            <td>
+                                                <span class="badge" th:classappend="${user.locked ? 'bg-danger' : 'bg-success'}" th:text="${user.locked ? 'LOCKED' : 'ACTIVE'}">ACTIVE</span>
+                                            </td>
+                                            <td>
+                                                <form action="/admin/users/toggle-lock" method="post" class="d-inline">
+                                                    <input type="hidden" name="username" th:value="${user.username}">
+                                                    <input type="hidden" name="locked" th:value="${!user.locked}">
+                                                    <button type="submit" class="btn btn-sm" th:classappend="${user.locked ? 'btn-outline-success' : 'btn-outline-danger'}" th:text="${user.locked ? 'Unlock' : 'Lock'}">Lock</button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

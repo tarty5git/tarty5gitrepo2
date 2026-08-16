@@ -1,0 +1,9 @@
+version: '3.8'
+services:
+  rag-service:
+    build: .
+    ports:
+      - "5000:5000"
+    environment:
+      - MODEL_CHAT=llama3.2:latest
+      - MODEL_EMBED=nomic-embed-text

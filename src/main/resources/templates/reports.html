@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Approver Status Report - Software Development Document Environment</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+</head>
+<body class="bg-light">
+    <div class="container-fluid px-4 py-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h4 class="fw-bold"><i class="bi bi-bar-chart-line me-2"></i>Approver Document Status Report</h4>
+            <div>
+                <a href="/reports/download/excel" class="btn btn-sm btn-success me-2"><i class="bi bi-file-earmark-excel me-1"></i> Export Excel</a>
+                <a href="/reports/download/pdf" class="btn btn-sm btn-danger me-2"><i class="bi bi-file-earmark-pdf me-1"></i> Export PDF</a>
+                <a href="/" class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-left"></i> Workbench</a>
+            </div>
+        </div>
+
+        <div class="card shadow-sm">
+            <div class="card-header bg-dark text-white fw-bold">Online Configurable Approver Report Summary</div>
+            <div class="card-body p-0">
+                <table class="table table-striped table-hover mb-0 align-middle">
+                    <thead class="table-secondary">
+                        <tr>
+                            <th>Doc ID</th>
+                            <th>Phase</th>
+                            <th>Deliverable Code</th>
+                            <th>Title</th>
+                            <th>Version</th>
+                            <th>Status</th>
+                            <th>Maker</th>
+                            <th>Approver Name</th>
+                            <th>Approval Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="doc : ${reportData}">
+                            <td class="fw-bold" th:text="${doc.docId}">P101</td>
+                            <td th:text="'Phase ' + ${doc.phaseNum}">Phase 1</td>
+                            <td th:text="${doc.deliverableCode}">PC-01</td>
+                            <td th:text="${doc.docTitle}">Title</td>
+                            <td th:text="${doc.docVersion}">1.0</td>
+                            <td>
+                                <span class="badge" th:classappend="${doc.status == 'APPROVED' ? 'bg-success' : (doc.status == 'REJECTED' ? 'bg-danger' : 'bg-warning text-dark')}" th:text="${doc.status}">STATUS</span>
+                            </td>
+                            <td th:text="${doc.uploadedBy}">maker</td>
+                            <td class="fw-bold text-primary" th:text="${doc.approvedBy != null ? doc.approvedBy : 'Pending Action'}">checker</td>
+                            <td th:text="${doc.approvedAt != null ? #temporals.format(doc.approvedAt, 'yyyy-MM-dd HH:mm:ss') : '-'}">-</td>
+                        </tr>
+                        <tr th:if="${reportData.isEmpty()}">
+                            <td colspan="9" class="text-center py-4 text-muted">No report data available.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
