@@ -2,6 +2,7 @@ package com.cth.sdm.controller;
 
 import com.cth.sdm.entity.SDLCPhaseDocument;
 import com.cth.sdm.service.DocumentService;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -23,10 +24,25 @@ public class MainWebController {
         return "login";
     }
 
+    private String getEffectiveProjectFilter(String requestFilter, HttpSession session) {
+        if (requestFilter != null && !requestFilter.trim().isEmpty()) {
+            session.setAttribute("sessionProjectFilter", requestFilter);
+            return requestFilter;
+        }
+        Object sessionVal = session.getAttribute("sessionProjectFilter");
+        if (sessionVal != null) {
+            return sessionVal.toString();
+        }
+        return "ALL";
+    }
+
     @GetMapping("/")
     public String dashboard(Model model,
-                            @RequestParam(value = "projectFilter", required = false, defaultValue = "ALL") String projectFilter,
+                            @RequestParam(value = "projectFilter", required = false) String requestFilter,
+                            HttpSession session,
                             Authentication auth) {
+        String projectFilter = getEffectiveProjectFilter(requestFilter, session);
+
         model.addAttribute("appName", documentService.getAppName());
         model.addAttribute("appCode", documentService.getAppCode());
         model.addAttribute("username", auth != null ? auth.getName() : "Guest");
@@ -45,7 +61,10 @@ public class MainWebController {
     @GetMapping("/processed-documents")
     public String processedDocuments(Model model,
                                      @RequestParam(value = "selectedDocId", required = false) String selectedDocId,
-                                     @RequestParam(value = "projectFilter", required = false, defaultValue = "ALL") String projectFilter) {
+                                     @RequestParam(value = "projectFilter", required = false) String requestFilter,
+                                     HttpSession session) {
+        String projectFilter = getEffectiveProjectFilter(requestFilter, session);
+
         List<SDLCPhaseDocument> allDocs = documentService.getAllDocuments(projectFilter);
         model.addAttribute("allDocs", allDocs);
         model.addAttribute("projectFilter", projectFilter);
@@ -63,7 +82,10 @@ public class MainWebController {
 
     @GetMapping("/checker/dashboard")
     public String checkerDashboard(Model model,
-                                   @RequestParam(value = "projectFilter", required = false, defaultValue = "ALL") String projectFilter) {
+                                   @RequestParam(value = "projectFilter", required = false) String requestFilter,
+                                   HttpSession session) {
+        String projectFilter = getEffectiveProjectFilter(requestFilter, session);
+
         List<SDLCPhaseDocument> allDocs = documentService.getAllDocuments(projectFilter);
         model.addAttribute("documents", allDocs);
         model.addAttribute("projectFilter", projectFilter);

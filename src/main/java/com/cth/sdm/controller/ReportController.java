@@ -5,6 +5,7 @@ import com.cth.sdm.service.DocumentService;
 import com.cth.sdm.service.ReportService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -32,9 +33,24 @@ public class ReportController {
         this.documentService = documentService;
     }
 
+    private String getEffectiveProjectFilter(String requestFilter, HttpSession session) {
+        if (requestFilter != null && !requestFilter.trim().isEmpty()) {
+            session.setAttribute("sessionProjectFilter", requestFilter);
+            return requestFilter;
+        }
+        Object sessionVal = session.getAttribute("sessionProjectFilter");
+        if (sessionVal != null) {
+            return sessionVal.toString();
+        }
+        return "ALL";
+    }
+
     @GetMapping("/view")
     public String viewReport(Model model,
-                             @RequestParam(value = "projectFilter", required = false, defaultValue = "ALL") String projectFilter) {
+                             @RequestParam(value = "projectFilter", required = false) String requestFilter,
+                             HttpSession session) {
+        String projectFilter = getEffectiveProjectFilter(requestFilter, session);
+
         List<SDLCPhaseDocument> reportData = reportService.getReportData(projectFilter);
         model.addAttribute("reportData", reportData);
         model.addAttribute("projectFilter", projectFilter);
@@ -45,7 +61,10 @@ public class ReportController {
     @GetMapping("/download/excel")
     @Operation(summary = "Download Approver Summary Report in Excel format")
     public ResponseEntity<InputStreamResource> downloadExcel(
-            @RequestParam(value = "projectFilter", required = false, defaultValue = "ALL") String projectFilter) throws IOException {
+            @RequestParam(value = "projectFilter", required = false) String requestFilter,
+            HttpSession session) throws IOException {
+        String projectFilter = getEffectiveProjectFilter(requestFilter, session);
+
         ByteArrayInputStream in = reportService.generateExcelReport(projectFilter);
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Disposition", "attachment; filename=Approver_Status_Report.xlsx");
@@ -59,7 +78,10 @@ public class ReportController {
     @GetMapping("/download/pdf")
     @Operation(summary = "Download Approver Summary Report in PDF format")
     public ResponseEntity<InputStreamResource> downloadPdf(
-            @RequestParam(value = "projectFilter", required = false, defaultValue = "ALL") String projectFilter) {
+            @RequestParam(value = "projectFilter", required = false) String requestFilter,
+            HttpSession session) {
+        String projectFilter = getEffectiveProjectFilter(requestFilter, session);
+
         ByteArrayInputStream in = reportService.generatePdfReport(projectFilter);
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Disposition", "attachment; filename=Approver_Status_Report.pdf");

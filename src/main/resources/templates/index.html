@@ -15,13 +15,13 @@
 <body>
     <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom py-3">
         <div class="container-fluid px-4">
-            <a class="navbar-brand" href="/" th:text="${appName}">Software Development Document Environment</a>
+            <a class="navbar-brand" th:href="@{/(projectFilter=${projectFilter})}" th:text="${appName}">Software Development Document Environment</a>
             <div class="d-flex align-items-center gap-3">
                 <span class="badge bg-secondary" th:text="'App Code: ' + ${appCode}">SDM</span>
                 <span class="text-dark small">User: <strong th:text="${username}">User</strong></span>
-                <a href="/processed-documents" class="btn btn-sm btn-outline-primary"><i class="bi bi-file-earmark-text"></i> Processed Documents</a>
-                <a href="/reports/view" class="btn btn-sm btn-outline-success"><i class="bi bi-bar-chart"></i> Approver Reports</a>
-                <a href="/checker/dashboard" sec:authorize="hasAnyRole('CHECKER', 'ADMIN')" class="btn btn-sm btn-outline-warning"><i class="bi bi-check-square"></i> Checker Dashboard</a>
+                <a th:href="@{/processed-documents(projectFilter=${projectFilter})}" class="btn btn-sm btn-outline-primary"><i class="bi bi-file-earmark-text"></i> Processed Documents</a>
+                <a th:href="@{/reports/view(projectFilter=${projectFilter})}" class="btn btn-sm btn-outline-success"><i class="bi bi-bar-chart"></i> Approver Reports</a>
+                <a th:href="@{/checker/dashboard(projectFilter=${projectFilter})}" sec:authorize="hasAnyRole('CHECKER', 'ADMIN')" class="btn btn-sm btn-outline-warning"><i class="bi bi-check-square"></i> Checker Dashboard</a>
                 <a href="/admin/dashboard" sec:authorize="hasRole('ADMIN')" class="btn btn-sm btn-outline-danger"><i class="bi bi-gear"></i> Admin Settings</a>
                 <a href="/swagger-ui.html" target="_blank" class="btn btn-sm btn-outline-info"><i class="bi bi-code-square"></i> Swagger API</a>
                 <form th:action="@{/logout}" method="post" class="d-inline">
@@ -37,7 +37,6 @@
                 <h4 class="fw-bold text-dark mb-1">SDLC Phase Deliverable Documents Workbench</h4>
                 <p class="text-muted mb-0">Upload and review deliverable documents across all 7 SDLC lifecycle phases.</p>
             </div>
-            <!-- Project Filter Controls -->
             <div class="col-md-5">
                 <form action="/" method="get" class="d-flex align-items-center justify-content-end gap-2">
                     <label class="fw-bold text-dark small mb-0"><i class="bi bi-funnel me-1"></i>Project Filter:</label>
