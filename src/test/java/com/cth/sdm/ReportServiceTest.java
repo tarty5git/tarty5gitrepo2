@@ -32,13 +32,13 @@ public class ReportServiceTest {
                 "Dummy SRS content".getBytes()
         );
 
-        documentService.submitDocument(2, "SRS-01", "System Requirement Spec", "SRS Desc", "1.0", file, "maker");
+        documentService.submitDocument(2, "SRS-01", "System Requirement Spec", "SRS Desc", "1.0", "PRJ-01", file, "maker");
 
-        ByteArrayInputStream excelReport = reportService.generateExcelReport();
+        ByteArrayInputStream excelReport = reportService.generateExcelReport("ALL");
         assertNotNull(excelReport);
         assertTrue(excelReport.available() > 0);
 
-        ByteArrayInputStream pdfReport = reportService.generatePdfReport();
+        ByteArrayInputStream pdfReport = reportService.generatePdfReport("ALL");
         assertNotNull(pdfReport);
         assertTrue(pdfReport.available() > 0);
     }

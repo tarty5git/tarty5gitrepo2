@@ -50,6 +50,15 @@ public class DocumentService {
                 .orElse("Software Development Document Environment");
     }
 
+    public List<String> getAvailableProjectCodes() {
+        List<String> projects = docRepository.findDistinctProjectCodes();
+        if (projects.isEmpty()) {
+            projects.add("PRJ-01");
+            projects.add("PRJ-02");
+        }
+        return projects;
+    }
+
     public String generateNextDocId(int phaseNum) {
         List<SDLCPhaseDocument> phaseDocs = docRepository.findByPhaseNumOrderByUploadedAtDesc(phaseNum);
         int nextSeq = phaseDocs.size() + 1;
@@ -62,6 +71,7 @@ public class DocumentService {
                                              String docTitle,
                                              String docDescription,
                                              String docVersion,
+                                             String projectCode,
                                              MultipartFile file,
                                              String makerUsername) throws IOException {
         String docId = generateNextDocId(phaseNum);
@@ -94,6 +104,7 @@ public class DocumentService {
         doc.setDocDescription(docDescription);
         doc.setDocVersion(docVersion);
         doc.setAppCode(appCode);
+        doc.setProjectCode(projectCode != null && !projectCode.trim().isEmpty() ? projectCode : "PRJ-01");
         doc.setFilePath(filePath);
         doc.setOriginalFilename(originalFilename);
         doc.setFileType(fileType);
@@ -109,11 +120,11 @@ public class DocumentService {
         request.setTargetDocId(docId);
         request.setMakerUsername(makerUsername);
         request.setStatus("PENDING");
-        request.setRemarks("Submission for deliverable " + deliverableCode);
+        request.setRemarks("Submission for deliverable " + deliverableCode + " (Project: " + doc.getProjectCode() + ")");
         request.setRequestedAt(LocalDateTime.now());
         requestRepository.save(request);
 
-        auditService.logEvent("DOCUMENT_SUBMITTED", makerUsername, originalFilename, "Submitted document ID: " + docId + " for Phase " + phaseNum);
+        auditService.logEvent("DOCUMENT_SUBMITTED", makerUsername, originalFilename, "Submitted document ID: " + docId + " for Phase " + phaseNum + " Project: " + doc.getProjectCode());
         notificationService.sendApproverNotification(docId, makerUsername, "SUBMITTED");
 
         return saved;
@@ -167,11 +178,17 @@ public class DocumentService {
         notificationService.sendApproverNotification(docId, checkerUsername, "REJECTED");
     }
 
-    public List<SDLCPhaseDocument> getDocumentsByPhase(int phaseNum) {
+    public List<SDLCPhaseDocument> getDocumentsByPhase(int phaseNum, String projectFilter) {
+        if (projectFilter != null && !projectFilter.trim().isEmpty() && !"ALL".equalsIgnoreCase(projectFilter)) {
+            return docRepository.findByPhaseNumAndProjectCodeOrderByUploadedAtDesc(phaseNum, projectFilter);
+        }
         return docRepository.findByPhaseNumOrderByUploadedAtDesc(phaseNum);
     }
 
-    public List<SDLCPhaseDocument> getAllDocuments() {
+    public List<SDLCPhaseDocument> getAllDocuments(String projectFilter) {
+        if (projectFilter != null && !projectFilter.trim().isEmpty() && !"ALL".equalsIgnoreCase(projectFilter)) {
+            return docRepository.findByProjectCodeOrderByUploadedAtDesc(projectFilter);
+        }
         return docRepository.findAllByOrderByUploadedAtDesc();
     }
 

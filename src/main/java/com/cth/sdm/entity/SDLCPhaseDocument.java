@@ -32,6 +32,9 @@ public class SDLCPhaseDocument {
     @Column(nullable = false, length = 10)
     private String appCode;
 
+    @Column(length = 50)
+    private String projectCode = "PRJ-01";
+
     @Column(length = 500)
     private String filePath;
 
@@ -85,6 +88,9 @@ public class SDLCPhaseDocument {
 
     public String getAppCode() { return appCode; }
     public void setAppCode(String appCode) { this.appCode = appCode; }
+
+    public String getProjectCode() { return projectCode; }
+    public void setProjectCode(String projectCode) { this.projectCode = projectCode; }
 
     public String getFilePath() { return filePath; }
     public void setFilePath(String filePath) { this.filePath = filePath; }

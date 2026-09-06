@@ -30,16 +30,19 @@ public class ReportService {
         this.docRepository = docRepository;
     }
 
-    public List<SDLCPhaseDocument> getReportData() {
+    public List<SDLCPhaseDocument> getReportData(String projectFilter) {
+        if (projectFilter != null && !projectFilter.trim().isEmpty() && !"ALL".equalsIgnoreCase(projectFilter)) {
+            return docRepository.findByProjectCodeOrderByUploadedAtDesc(projectFilter);
+        }
         return docRepository.findAllByOrderByUploadedAtDesc();
     }
 
-    public ByteArrayInputStream generateExcelReport() throws IOException {
-        List<SDLCPhaseDocument> docs = getReportData();
+    public ByteArrayInputStream generateExcelReport(String projectFilter) throws IOException {
+        List<SDLCPhaseDocument> docs = getReportData(projectFilter);
         try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
             Sheet sheet = workbook.createSheet("Approver Summary Report");
 
-            String[] headers = {"Doc ID", "Phase", "Deliverable Code", "Document Title", "Version", "Status", "Maker", "Approver Name", "Approval Date"};
+            String[] headers = {"Doc ID", "Project", "Phase", "Deliverable Code", "Document Title", "Version", "Status", "Maker", "Approver Name", "Approval Date"};
             Row headerRow = sheet.createRow(0);
             for (int i = 0; i < headers.length; i++) {
                 Cell cell = headerRow.createCell(i);
@@ -51,14 +54,15 @@ public class ReportService {
             for (SDLCPhaseDocument doc : docs) {
                 Row row = sheet.createRow(rowIdx++);
                 row.createCell(0).setCellValue(doc.getDocId());
-                row.createCell(1).setCellValue("Phase " + doc.getPhaseNum());
-                row.createCell(2).setCellValue(doc.getDeliverableCode());
-                row.createCell(3).setCellValue(doc.getDocTitle());
-                row.createCell(4).setCellValue(doc.getDocVersion());
-                row.createCell(5).setCellValue(doc.getStatus());
-                row.createCell(6).setCellValue(doc.getUploadedBy());
-                row.createCell(7).setCellValue(doc.getApprovedBy() != null ? doc.getApprovedBy() : "Pending");
-                row.createCell(8).setCellValue(doc.getApprovedAt() != null ? doc.getApprovedAt().format(formatter) : "-");
+                row.createCell(1).setCellValue(doc.getProjectCode());
+                row.createCell(2).setCellValue("Phase " + doc.getPhaseNum());
+                row.createCell(3).setCellValue(doc.getDeliverableCode());
+                row.createCell(4).setCellValue(doc.getDocTitle());
+                row.createCell(5).setCellValue(doc.getDocVersion());
+                row.createCell(6).setCellValue(doc.getStatus());
+                row.createCell(7).setCellValue(doc.getUploadedBy());
+                row.createCell(8).setCellValue(doc.getApprovedBy() != null ? doc.getApprovedBy() : "Pending");
+                row.createCell(9).setCellValue(doc.getApprovedAt() != null ? doc.getApprovedAt().format(formatter) : "-");
             }
 
             workbook.write(out);
@@ -66,8 +70,8 @@ public class ReportService {
         }
     }
 
-    public ByteArrayInputStream generatePdfReport() {
-        List<SDLCPhaseDocument> docs = getReportData();
+    public ByteArrayInputStream generatePdfReport(String projectFilter) {
+        List<SDLCPhaseDocument> docs = getReportData(projectFilter);
         Document document = new Document(PageSize.A4.rotate());
         ByteArrayOutputStream out = new ByteArrayOutputStream();
 
@@ -81,8 +85,9 @@ public class ReportService {
             document.add(title);
             document.add(new Paragraph(" "));
 
-            Table table = new Table(8);
+            Table table = new Table(9);
             table.addCell("Doc ID");
+            table.addCell("Project");
             table.addCell("Phase");
             table.addCell("Deliverable");
             table.addCell("Title");
@@ -94,6 +99,7 @@ public class ReportService {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
             for (SDLCPhaseDocument doc : docs) {
                 table.addCell(doc.getDocId());
+                table.addCell(doc.getProjectCode());
                 table.addCell("Phase " + doc.getPhaseNum());
                 table.addCell(doc.getDeliverableCode());
                 table.addCell(doc.getDocTitle());

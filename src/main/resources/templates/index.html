@@ -32,10 +32,20 @@
     </nav>
 
     <div class="container-fluid px-4 py-4">
-        <div class="row mb-4">
-            <div class="col-12">
+        <div class="row mb-4 align-items-center">
+            <div class="col-md-7">
                 <h4 class="fw-bold text-dark mb-1">SDLC Phase Deliverable Documents Workbench</h4>
-                <p class="text-muted">Upload and review deliverable documents across all 7 SDLC lifecycle phases.</p>
+                <p class="text-muted mb-0">Upload and review deliverable documents across all 7 SDLC lifecycle phases.</p>
+            </div>
+            <!-- Project Filter Controls -->
+            <div class="col-md-5">
+                <form action="/" method="get" class="d-flex align-items-center justify-content-end gap-2">
+                    <label class="fw-bold text-dark small mb-0"><i class="bi bi-funnel me-1"></i>Project Filter:</label>
+                    <select name="projectFilter" class="form-select form-select-sm w-auto" onchange="this.form.submit()">
+                        <option value="ALL" th:selected="${projectFilter == 'ALL'}">-- All Projects --</option>
+                        <option th:each="prj : ${projectCodes}" th:value="${prj}" th:text="${prj}" th:selected="${projectFilter == prj}">PRJ-01</option>
+                    </select>
+                </form>
             </div>
         </div>
 
@@ -56,6 +66,12 @@
                                     <input type="hidden" name="phaseNum" value="1">
                                     <input type="hidden" name="deliverableCode" value="PC-01">
                                     <input type="hidden" name="docTitle" value="Project Charter Document">
+                                    <div class="mb-2">
+                                        <select name="projectCode" class="form-select form-select-sm">
+                                            <option value="PRJ-01">Project PRJ-01</option>
+                                            <option value="PRJ-02">Project PRJ-02</option>
+                                        </select>
+                                    </div>
                                     <div class="mb-2"><input type="text" name="docVersion" class="form-control form-control-sm" placeholder="Version (e.g. 1.0)" required value="1.0"></div>
                                     <div class="mb-2"><input type="text" name="docDescription" class="form-control form-control-sm" placeholder="Configurable description..."></div>
                                     <div class="mb-2"><input type="file" name="file" class="form-control form-control-sm" required></div>
@@ -69,6 +85,12 @@
                                     <input type="hidden" name="phaseNum" value="1">
                                     <input type="hidden" name="deliverableCode" value="FS-01">
                                     <input type="hidden" name="docTitle" value="Feasibility Study Document">
+                                    <div class="mb-2">
+                                        <select name="projectCode" class="form-select form-select-sm">
+                                            <option value="PRJ-01">Project PRJ-01</option>
+                                            <option value="PRJ-02">Project PRJ-02</option>
+                                        </select>
+                                    </div>
                                     <div class="mb-2"><input type="text" name="docVersion" class="form-control form-control-sm" placeholder="Version (e.g. 1.0)" required value="1.0"></div>
                                     <div class="mb-2"><input type="text" name="docDescription" class="form-control form-control-sm" placeholder="Configurable description..."></div>
                                     <div class="mb-2"><input type="file" name="file" class="form-control form-control-sm" required></div>
@@ -96,6 +118,12 @@
                                     <input type="hidden" name="phaseNum" value="2">
                                     <input type="hidden" name="deliverableCode" value="SRS-01">
                                     <input type="hidden" name="docTitle" value="System Requirement Specification">
+                                    <div class="mb-2">
+                                        <select name="projectCode" class="form-select form-select-sm">
+                                            <option value="PRJ-01">Project PRJ-01</option>
+                                            <option value="PRJ-02">Project PRJ-02</option>
+                                        </select>
+                                    </div>
                                     <div class="mb-2"><input type="text" name="docVersion" class="form-control form-control-sm" placeholder="Version (e.g. 1.0)" required value="1.0"></div>
                                     <div class="mb-2"><input type="text" name="docDescription" class="form-control form-control-sm" placeholder="Configurable description..."></div>
                                     <div class="mb-2"><input type="file" name="file" class="form-control form-control-sm" required></div>
@@ -109,6 +137,12 @@
                                     <input type="hidden" name="phaseNum" value="2">
                                     <input type="hidden" name="deliverableCode" value="UC-01">
                                     <input type="hidden" name="docTitle" value="Use Case Document">
+                                    <div class="mb-2">
+                                        <select name="projectCode" class="form-select form-select-sm">
+                                            <option value="PRJ-01">Project PRJ-01</option>
+                                            <option value="PRJ-02">Project PRJ-02</option>
+                                        </select>
+                                    </div>
                                     <div class="mb-2"><input type="text" name="docVersion" class="form-control form-control-sm" placeholder="Version (e.g. 1.0)" required value="1.0"></div>
                                     <div class="mb-2"><input type="text" name="docDescription" class="form-control form-control-sm" placeholder="Configurable description..."></div>
                                     <div class="mb-2"><input type="file" name="file" class="form-control form-control-sm" required></div>

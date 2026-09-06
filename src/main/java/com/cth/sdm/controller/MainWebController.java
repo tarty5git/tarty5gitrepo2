@@ -24,14 +24,18 @@ public class MainWebController {
     }
 
     @GetMapping("/")
-    public String dashboard(Model model, Authentication auth) {
+    public String dashboard(Model model,
+                            @RequestParam(value = "projectFilter", required = false, defaultValue = "ALL") String projectFilter,
+                            Authentication auth) {
         model.addAttribute("appName", documentService.getAppName());
         model.addAttribute("appCode", documentService.getAppCode());
         model.addAttribute("username", auth != null ? auth.getName() : "Guest");
+        model.addAttribute("projectFilter", projectFilter);
+        model.addAttribute("projectCodes", documentService.getAvailableProjectCodes());
 
         Map<Integer, List<SDLCPhaseDocument>> phaseDocsMap = new HashMap<>();
         for (int p = 1; p <= 7; p++) {
-            phaseDocsMap.put(p, documentService.getDocumentsByPhase(p));
+            phaseDocsMap.put(p, documentService.getDocumentsByPhase(p, projectFilter));
         }
         model.addAttribute("phaseDocsMap", phaseDocsMap);
 
@@ -39,9 +43,13 @@ public class MainWebController {
     }
 
     @GetMapping("/processed-documents")
-    public String processedDocuments(Model model, @RequestParam(value = "selectedDocId", required = false) String selectedDocId) {
-        List<SDLCPhaseDocument> allDocs = documentService.getAllDocuments();
+    public String processedDocuments(Model model,
+                                     @RequestParam(value = "selectedDocId", required = false) String selectedDocId,
+                                     @RequestParam(value = "projectFilter", required = false, defaultValue = "ALL") String projectFilter) {
+        List<SDLCPhaseDocument> allDocs = documentService.getAllDocuments(projectFilter);
         model.addAttribute("allDocs", allDocs);
+        model.addAttribute("projectFilter", projectFilter);
+        model.addAttribute("projectCodes", documentService.getAvailableProjectCodes());
 
         if (selectedDocId != null && !selectedDocId.isEmpty()) {
             Optional<SDLCPhaseDocument> selectedDoc = documentService.getDocumentById(selectedDocId);
@@ -54,9 +62,12 @@ public class MainWebController {
     }
 
     @GetMapping("/checker/dashboard")
-    public String checkerDashboard(Model model) {
-        List<SDLCPhaseDocument> allDocs = documentService.getAllDocuments();
+    public String checkerDashboard(Model model,
+                                   @RequestParam(value = "projectFilter", required = false, defaultValue = "ALL") String projectFilter) {
+        List<SDLCPhaseDocument> allDocs = documentService.getAllDocuments(projectFilter);
         model.addAttribute("documents", allDocs);
+        model.addAttribute("projectFilter", projectFilter);
+        model.addAttribute("projectCodes", documentService.getAvailableProjectCodes());
         return "checker";
     }
 

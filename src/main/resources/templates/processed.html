@@ -14,7 +14,16 @@
     <div class="container-fluid px-4 py-4">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h4 class="fw-bold"><i class="bi bi-file-earmark-check me-2"></i>Processed Documents Explorer</h4>
-            <a href="/" class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-left"></i> Back to Workbench</a>
+            <div class="d-flex align-items-center gap-3">
+                <form action="/processed-documents" method="get" class="d-flex align-items-center gap-2">
+                    <label class="fw-bold small mb-0"><i class="bi bi-funnel me-1"></i>Project Filter:</label>
+                    <select name="projectFilter" class="form-select form-select-sm w-auto" onchange="this.form.submit()">
+                        <option value="ALL" th:selected="${projectFilter == 'ALL'}">-- All Projects --</option>
+                        <option th:each="prj : ${projectCodes}" th:value="${prj}" th:text="${prj}" th:selected="${projectFilter == prj}">PRJ-01</option>
+                    </select>
+                </form>
+                <a href="/" class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-left"></i> Back to Workbench</a>
+            </div>
         </div>
 
         <div class="row">
@@ -23,16 +32,16 @@
                     <div class="card-header bg-dark text-white fw-bold">Select Processed Document</div>
                     <div class="list-group list-group-flush">
                         <a th:each="doc : ${allDocs}"
-                           th:href="@{/processed-documents(selectedDocId=${doc.docId})}"
+                           th:href="@{/processed-documents(selectedDocId=${doc.docId}, projectFilter=${projectFilter})}"
                            class="list-group-item list-group-item-action"
                            th:classappend="${selectedDoc != null and selectedDoc.docId == doc.docId} ? 'active' : ''">
                             <div class="d-flex justify-content-between">
                                 <strong th:text="${doc.docId} + ' - ' + ${doc.deliverableCode}">P101</strong>
-                                <span class="badge bg-secondary" th:text="'Phase ' + ${doc.phaseNum}">Phase 1</span>
+                                <span class="badge bg-secondary" th:text="${doc.projectCode}">PRJ-01</span>
                             </div>
                             <div class="small text-muted" th:text="${doc.originalFilename}">file.docx</div>
                         </a>
-                        <div th:if="${allDocs.isEmpty()}" class="p-3 text-muted text-center">No documents processed yet.</div>
+                        <div th:if="${allDocs.isEmpty()}" class="p-3 text-muted text-center">No documents processed yet for selected filter.</div>
                     </div>
                 </div>
             </div>
@@ -40,13 +49,13 @@
             <div class="col-md-8" th:if="${selectedDoc != null}">
                 <div class="card shadow-sm mb-4">
                     <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                        <span class="fw-bold" th:text="'Document Details: ' + ${selectedDoc.docId}">Details</span>
+                        <span class="fw-bold" th:text="'Document Details: ' + ${selectedDoc.docId} + ' (' + ${selectedDoc.projectCode} + ')'">Details</span>
                         <span class="badge bg-light text-primary" th:text="${selectedDoc.status}">STATUS</span>
                     </div>
                     <div class="card-body">
                         <div class="row mb-3">
                             <div class="col-md-4"><strong>Deliverable Code:</strong> <p th:text="${selectedDoc.deliverableCode}">PC-01</p></div>
-                            <div class="col-md-4"><strong>App Code:</strong> <p th:text="${selectedDoc.appCode}">SDM</p></div>
+                            <div class="col-md-4"><strong>Project Code:</strong> <p th:text="${selectedDoc.projectCode}">PRJ-01</p></div>
                             <div class="col-md-4"><strong>Version:</strong> <p th:text="${selectedDoc.docVersion}">1.0</p></div>
                         </div>
 

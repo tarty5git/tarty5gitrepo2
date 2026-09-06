@@ -37,6 +37,7 @@ public class DocumentApiController {
             @RequestParam("docTitle") String docTitle,
             @RequestParam(value = "docDescription", required = false) String docDescription,
             @RequestParam("docVersion") String docVersion,
+            @RequestParam(value = "projectCode", required = false, defaultValue = "PRJ-01") String projectCode,
             @RequestParam("file") MultipartFile file,
             Authentication authentication) {
 
@@ -44,11 +45,12 @@ public class DocumentApiController {
         try {
             String username = authentication != null ? authentication.getName() : "maker";
             SDLCPhaseDocument doc = documentService.submitDocument(
-                    phaseNum, deliverableCode, docTitle, docDescription, docVersion, file, username);
+                    phaseNum, deliverableCode, docTitle, docDescription, docVersion, projectCode, file, username);
 
             response.put("status", "SUCCESS");
             response.put("message", "Document submitted successfully for Maker-Checker review");
             response.put("docId", doc.getDocId());
+            response.put("projectCode", doc.getProjectCode());
             response.put("processed", true);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
@@ -60,9 +62,10 @@ public class DocumentApiController {
     }
 
     @GetMapping
-    @Operation(summary = "List all documents")
-    public ResponseEntity<List<SDLCPhaseDocument>> getAllDocuments() {
-        return ResponseEntity.ok(documentService.getAllDocuments());
+    @Operation(summary = "List all documents with optional project level filter")
+    public ResponseEntity<List<SDLCPhaseDocument>> getAllDocuments(
+            @RequestParam(value = "projectFilter", required = false, defaultValue = "ALL") String projectFilter) {
+        return ResponseEntity.ok(documentService.getAllDocuments(projectFilter));
     }
 
     @GetMapping("/{docId}")

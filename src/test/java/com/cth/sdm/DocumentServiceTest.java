@@ -29,10 +29,11 @@ public class DocumentServiceTest {
         );
 
         SDLCPhaseDocument doc = documentService.submitDocument(
-                1, "PC-01", "Project Charter Title", "Sample Description", "1.0", file, "maker");
+                1, "PC-01", "Project Charter Title", "Sample Description", "1.0", "PRJ-01", file, "maker");
 
         assertNotNull(doc);
         assertEquals("P101", doc.getDocId());
+        assertEquals("PRJ-01", doc.getProjectCode());
         assertEquals("PENDING_APPROVAL", doc.getStatus());
 
         documentService.approveDocument("P101", "checker");
